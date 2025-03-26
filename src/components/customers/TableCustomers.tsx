@@ -42,10 +42,7 @@ const TableCustomers = () => {
     totalPrice: number;
   } | null>(null);
 
-  const [editingStartDate, setEditingStartDate] = useState<{
-    _id: string;
-    startDate: Date;
-  } | null>(null);
+
 
   useEffect(() => {
     dispatch(
@@ -272,16 +269,6 @@ const TableCustomers = () => {
                           }`}>
                           تعديل السعر
                         </button>
-                        <button
-                          onClick={() =>
-                            setEditingStartDate({
-                              _id: customer._id,
-                              startDate: customer.startDate || new Date(),
-                            })
-                          }
-                          className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-lg transition-colors">
-                          تحديد تاريخ البدء
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -388,16 +375,6 @@ const TableCustomers = () => {
                       }`}>
                       تعديل السعر
                     </button>
-                    <button
-                      onClick={() =>
-                        setEditingStartDate({
-                          _id: customer._id,
-                          startDate: customer.startDate || new Date(),
-                        })
-                      }
-                      className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-lg transition-colors">
-                      تحديد تاريخ البدء
-                    </button>
                   </div>
                 </div>
               </div>
@@ -430,46 +407,6 @@ const TableCustomers = () => {
           customer={editingPrice}
           onClose={() => setEditingPrice(null)}
         />
-      )}
-
-      {/* Edit Start Date Modal */}
-      {editingStartDate && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">تحديد تاريخ البدء</h2>
-            <input
-              type="date"
-              value={editingStartDate.startDate.toISOString().split("T")[0]}
-              onChange={(e) =>
-                setEditingStartDate({
-                  ...editingStartDate,
-                  startDate: new Date(e.target.value),
-                })
-              }
-              className="border p-2 rounded"
-            />
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={async () => {
-                  await dispatch(
-                    editCustomer({
-                      id: editingStartDate._id,
-                    })
-                  ).unwrap();
-                  setEditingStartDate(null);
-                  dispatch(fetchCustomers({}));
-                }}
-                className="bg-blue-500 text-white px-4 py-2 rounded">
-                حفظ
-              </button>
-              <button
-                onClick={() => setEditingStartDate(null)}
-                className="ml-2 bg-gray-500 text-white px-4 py-2 rounded">
-                إلغاء
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
