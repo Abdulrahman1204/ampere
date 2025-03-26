@@ -18,7 +18,7 @@ const DashboardLayout =  async({ children }: AdminDashboardLayoutProps) => {
   const user_data = await user();
   const role = user_data?.role as string;
   return (
-    <div className="flex w-full min-h-screen bg-gray-100">
+    <div className="flex w-[100%] min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="lg:w-64 z-40">
         <AdminSidebar role={role}/>
