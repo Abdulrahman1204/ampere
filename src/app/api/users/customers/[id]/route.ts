@@ -98,6 +98,26 @@ export async function PUT(
       totalPriceOfAmpere = priceOfAmpere * body.numberOfAmpere;
     }
 
+    const profitsData = await Profits.findOne({});
+    let newProfits;
+    if (body.totalPrice) {
+      let newPriceProfite;
+      if (user.totalPrice > body.totalPrice) {
+        newPriceProfite = user.totalPrice - body.totalPrice;
+        newProfits = (profitsData?.profits || 0) - newPriceProfite;
+      } else {
+        newPriceProfite = body.totalPrice - user.totalPrice;
+        newProfits = (profitsData?.profits || 0) + newPriceProfite;
+      }
+
+      
+
+      await Profits.findOneAndUpdate(
+        {},
+        { profits: newProfits },
+        { upsert: true, new: true }
+      );
+    }
     await User.findByIdAndUpdate(id, {
       $set: {
         userName: body.userName,
@@ -152,22 +172,18 @@ export async function POST(
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // تحديث حالة الأسبوع
     const weeks = user.weeks;
     const firstUnpaidWeekIndex = weeks.findIndex((week) => !week); // البحث عن أول أسبوع غير مدفوع
 
     if (firstUnpaidWeekIndex !== -1) {
-      weeks[firstUnpaidWeekIndex] = true; // تحويل الأسبوع إلى مدفوع
-
-      // إذا كانت جميع الأسابيع مدفوعة (true)، نقوم بتحويلها جميعًا إلى false وتحديث startDate إلى الشهر الجديد
+      weeks[firstUnpaidWeekIndex] = true; 
       if (weeks.every((week) => week)) {
-        weeks.fill(false); // إعادة تعيين جميع الأسابيع إلى false
-
-        // تحديث startDate إلى أول سبت من الشهر الجديد
+        weeks.fill(false); 
         const newStartDate = new Date(user.startDate || new Date()); // إذا لم يكن هناك startDate، نستخدم التاريخ الحالي
         newStartDate.setMonth(newStartDate.getMonth() + 1); // الانتقال إلى الشهر الجديد
-        newStartDate.setDate(newStartDate.getDate() + (6 - newStartDate.getDay())); // الانتقال إلى أول سبت من الشهر الجديد
-
+        newStartDate.setDate(
+          newStartDate.getDate() + (6 - newStartDate.getDay())
+        ); 
         await User.findByIdAndUpdate(id, { weeks, startDate: newStartDate });
       } else {
         await User.findByIdAndUpdate(id, { weeks });
