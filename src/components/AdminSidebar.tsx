@@ -34,7 +34,7 @@ const AdminSidebar = ({role}: {role: string}) => {
       {/* Mobile Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="fixed bottom-4 right-4 z-50 p-2 bg-gray-800 text-white rounded-lg lg:hidden focus:outline-none">
+        className="fixed bottom-4 right-4 z-50 p-2 bg-gray-800 text-white rounded-lg xl:hidden focus:outline-none">
         {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
       </button>
 
@@ -42,7 +42,7 @@ const AdminSidebar = ({role}: {role: string}) => {
       <div
         className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-gray-800 to-gray-900 text-white transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 transition-transform duration-200 ease-in-out z-40`}>
+        } xl:translate-x-0 transition-transform duration-200 ease-in-out z-40`}>
         <div className="p-6 flex flex-col h-full">
           <h2 className="text-xl font-bold mb-6 text-center">لوحة التحكم</h2>
 

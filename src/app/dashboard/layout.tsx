@@ -20,7 +20,7 @@ const DashboardLayout =  async({ children }: AdminDashboardLayoutProps) => {
   return (
     <div className="flex w-[100%] min-h-screen">
       {/* Sidebar */}
-      <div className="lg:w-64 z-40">
+      <div className="xl:w-64 z-40">
         <AdminSidebar role={role}/>
       </div>
 
