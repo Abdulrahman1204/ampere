@@ -9,6 +9,12 @@ const ProfitsSchema: Schema<IProfits> = new Schema(
       type: Number,
       required: true,
     },
+    updates: [
+      {
+        amount: { type: Number, required: true },
+        date: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,
@@ -30,10 +36,18 @@ const validateCreateProfits = (obj: IProfits): joi.ValidationResult => {
 
 const validateUpdateProfits = (obj: IProfits): joi.ValidationResult => {
   const schema: ObjectSchema = joi.object({
-    profits: joi.number(),
+    profits: joi.number().required(),
+    updates: joi
+      .array()
+      .items(
+        joi.object({
+          amount: joi.number().required(),
+          date: joi.date().default(Date.now),
+        })
+      )
+      .optional(),
   });
 
-  return schema.validate(obj);
+  return schema.validate(obj, { abortEarly: false });
 };
-
 export { Profits, validateCreateProfits, validateUpdateProfits };

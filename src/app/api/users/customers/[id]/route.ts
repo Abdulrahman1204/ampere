@@ -98,6 +98,9 @@ export async function PUT(
       totalPriceOfAmpere = priceOfAmpere * body.numberOfAmpere;
     }
 
+    const shouldUpdateStartDate =
+      user.available === false && body.available === true;
+
     const profitsData = await Profits.findOne({});
     let newProfits;
     if (body.totalPrice) {
@@ -110,24 +113,29 @@ export async function PUT(
         newProfits = (profitsData?.profits || 0) + newPriceProfite;
       }
 
-      
-
       await Profits.findOneAndUpdate(
         {},
         { profits: newProfits },
         { upsert: true, new: true }
       );
     }
+    const updateData: Partial<IUser> = {
+      userName: body.userName,
+      phoneNumber: body.phoneNumber,
+      numberOfAmpere: body.numberOfAmpere,
+      numberOfPlate: body.numberOfPlate,
+      available: body.available,
+      note: body.note,
+      totalPrice: totalPriceOfAmpere || body.totalPrice,
+    };
+
+    // Update startDate only when changing from false to true
+    if (shouldUpdateStartDate) {
+      updateData.startDate = new Date();
+    }
+
     await User.findByIdAndUpdate(id, {
-      $set: {
-        userName: body.userName,
-        phoneNumber: body.phoneNumber,
-        numberOfAmpere: body.numberOfAmpere,
-        numberOfPlate: body.numberOfPlate,
-        available: body.available,
-        note: body.note,
-        totalPrice: totalPriceOfAmpere || body.totalPrice,
-      },
+      $set: updateData,
     });
 
     return NextResponse.json(
@@ -176,14 +184,14 @@ export async function POST(
     const firstUnpaidWeekIndex = weeks.findIndex((week) => !week); // البحث عن أول أسبوع غير مدفوع
 
     if (firstUnpaidWeekIndex !== -1) {
-      weeks[firstUnpaidWeekIndex] = true; 
+      weeks[firstUnpaidWeekIndex] = true;
       if (weeks.every((week) => week)) {
-        weeks.fill(false); 
+        weeks.fill(false);
         const newStartDate = new Date(user.startDate || new Date()); // إذا لم يكن هناك startDate، نستخدم التاريخ الحالي
         newStartDate.setMonth(newStartDate.getMonth() + 1); // الانتقال إلى الشهر الجديد
         newStartDate.setDate(
           newStartDate.getDate() + (6 - newStartDate.getDay())
-        ); 
+        );
         await User.findByIdAndUpdate(id, { weeks, startDate: newStartDate });
       } else {
         await User.findByIdAndUpdate(id, { weeks });

@@ -3,7 +3,7 @@
 import React from "react";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
-import { editProfits } from "@/store/apiCalls/ProfitsApiCall";
+import { editProfits, fetchProfits } from "@/store/apiCalls/ProfitsApiCall";
 import { AppDispatch } from "@/store";
 
 const ProfitsZeroButton = () => {
@@ -23,6 +23,8 @@ const ProfitsZeroButton = () => {
 
     if (result.isConfirmed) {
       await dispatch(editProfits({ profits: 0 })).unwrap();
+      dispatch(fetchProfits());
+
       Swal.fire("تم!", "تم إعادة الأرباح إلى الصفر بنجاح.", "success");
     }
   };

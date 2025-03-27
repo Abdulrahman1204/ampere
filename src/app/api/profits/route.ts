@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const profitsModel = await Profits.findOne({});
+    const profitsModel = await Profits.findOne({}).sort({ createdAt: -1 });
     if (!profitsModel) {
       return NextResponse.json(
         { message: "Profits not found" },
@@ -126,9 +126,14 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ message: error.details[0].message });
     }
 
+    const oldProfits = await Profits.findOne();
+    const previousProfitAmount = oldProfits?.profits || 0;
     await Profits.findOneAndUpdate(
       {},
-      { profits },
+      {
+        profits,
+        $push: { updates: { amount: previousProfitAmount } }, // إضافة التحديث الجديد للمصفوفة
+      },
       { upsert: true, new: true }
     );
 
