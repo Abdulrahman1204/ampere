@@ -8,6 +8,7 @@ interface CustomerState {
   totalDiesel: number;
   totalRepair: number;
   totalExpenses: number;
+  totalReceipts: number;
   loading: boolean;
   netProfit: number;
   error: string | null;
@@ -19,6 +20,7 @@ const initialState: CustomerState = {
   totalDiesel: 0,
   totalRepair: 0,
   totalExpenses: 0,
+  totalReceipts: 0,
   netProfit:0,
   loading: false,
   error: null,
@@ -42,6 +44,7 @@ const billSlice = createSlice({
         state.totalDiesel = action.payload.totalDiesel;
         state.totalRepair = action.payload.totalRepair;
         state.totalExpenses = action.payload.totalExpenses;
+        state.totalReceipts = action.payload.totalReceipts;
         state.netProfit = action.payload.netProfit;
 
         console.log(action.payload);

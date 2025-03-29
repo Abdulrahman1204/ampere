@@ -32,7 +32,8 @@ const AddCustomerModal = () => {
   const handleAddCustomer = async () => {
     try {
       await dispatch(addCustomer(formData)).unwrap();
-
+        
+      // Reset form on success
       setFormData({
         userName: "",
         phoneNumber: "",
@@ -40,16 +41,17 @@ const AddCustomerModal = () => {
         numberOfPlate: 0,
         note: "لا شيء",
       });
-
-      dispatch(fetchCustomers({}));
+  
+      // Refresh customers list
+      await dispatch(fetchCustomers({}));
+      
+      // Close modal and show success message
       setIsOpen(false);
-      toast.success("Add customer Successfully");
+      toast.success("تم إضافة الزبون بنجاح");
     } catch (error) {
-      toast.error("Failed to add customer");
+      toast.error("فشل في إضافة الزبون");
       console.error("Error adding customer:", error);
     }
-
-    console.log(formData);
   };
 
   return (

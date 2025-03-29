@@ -34,7 +34,7 @@ interface DeleteCustomerParams {
 // Fetch Customers
 export const fetchCustomers = createAsyncThunk(
   "customers/fetchCustomers",
-  async ({ pageNumber, numberOfPlate, userName }: FetchCustomersParams) => {
+  async ({ pageNumber, numberOfPlate, userName }: FetchCustomersParams, { rejectWithValue }) => {
     try {
       const response = await request.get("/users/customers", {
         params: { pageNumber, numberOfPlate, userName },
@@ -42,8 +42,8 @@ export const fetchCustomers = createAsyncThunk(
 
       return response.data;
     } catch (err) {
-      console.error("Error adding customer:", err);
-      throw new Error("Internal server error");
+      const axiosError = err as AxiosError<{ message?: string }>;
+      return rejectWithValue(axiosError.response?.data?.message || "Failed to fetch admins");
     }
   }
 );
@@ -58,9 +58,10 @@ export const addCustomer = createAsyncThunk(
       return response.data;
     } catch (err) {
       const axiosError = err as AxiosError<{ message?: string }>;
-      return rejectWithValue(
-        axiosError.response?.data?.message || "Failed to fetch admins"
-      );
+      const serverMessage = axiosError.response?.data?.message;
+      
+      // إرجاع رسالة الخطأ كما هي (ستتم ترجمتها في الواجهة)
+      return rejectWithValue(serverMessage || "فشل في إضافة الزبون");
     }
   }
 );

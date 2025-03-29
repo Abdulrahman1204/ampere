@@ -117,7 +117,7 @@ const TableCustomers = () => {
     <div
       className="space-y-6 p-4 bg-gray-50 rounded-lg shadow-sm"
       style={{ direction: "rtl" }}>
-      <div className="flex space-x-2 justify-between items-center">
+      <div className=" max-xl:space-y-4 xl:flex space-x-2 justify-between items-center">
         <FilterCustomers
           userNameFilter={userNameFilter}
           setUserNameFilter={setUserNameFilter}

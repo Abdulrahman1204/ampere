@@ -100,6 +100,10 @@ export async function GET(request: NextRequest) {
       category: "مصاريف",
       available: true,
     };
+    const receiptsFilter: ProductsFilter = {
+      category: "مقبوضات",
+      available: true,
+    };
 
     if (category) {
       filter.category = { $regex: new RegExp(String(category), "i") };
@@ -122,6 +126,10 @@ export async function GET(request: NextRequest) {
         $gte: new Date(fromDate),
         $lte: new Date(toDate),
       };
+      receiptsFilter.createdAt = {
+        $gte: new Date(fromDate),
+        $lte: new Date(toDate),
+      };
     }
 
     const totalBills = await Bill.countDocuments(filter);
@@ -130,11 +138,15 @@ export async function GET(request: NextRequest) {
     const diesel = await Bill.find(dieselFilter);
     const repair = await Bill.find(repairFilter);
     const expenses = await Bill.find(expensesFilter);
+    const receipts = await Bill.find(receiptsFilter);
+
 
     // Calculate totals
     const totalDiesel = diesel.reduce((sum, item) => sum + item.price, 0);
     const totalRepair = repair.reduce((sum, item) => sum + item.price, 0);
     const totalExpenses = expenses.reduce((sum, item) => sum + item.price, 0);
+    const totalReceipts = receipts.reduce((sum, item) => sum + item.price, 0);
+
 
     const bills = await Bill.find(filter)
       .skip(ARTICLE_PER_PAGE * (parseInt(pageNumber) - 1))
@@ -143,7 +155,7 @@ export async function GET(request: NextRequest) {
       .populate("category", "title -_id");
 
     return NextResponse.json(
-      { bills, totalBills, totalDiesel, totalRepair, totalExpenses },
+      { bills, totalBills, totalDiesel, totalRepair, totalExpenses, totalReceipts },
       { status: 200 }
     );
   } catch (error) {

@@ -18,6 +18,7 @@ const TableBills = () => {
     totalDiesel,
     totalRepair,
     totalExpenses,
+    totalReceipts,
     loading,
   } = useSelector((state: RootState) => state.bills);
 
@@ -104,6 +105,17 @@ const TableBills = () => {
               <p className="text-sm opacity-80">تكلفة المصروفات الأخرى</p>
             </div>
             <div className="text-3xl font-bold">{totalExpenses} ل.س</div>
+          </div>
+        </div>
+        
+        {/* بطاقة إجمالي المقبوضات */}
+        <div className="bg-gradient-to-r from-red-500 to-red-600 p-6 rounded-lg shadow-lg text-white">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-lg font-semibold">إجمالي المقبوضات</p>
+              <p className="text-sm opacity-80">تكلفة المقبوضات الأخرى</p>
+            </div>
+            <div className="text-3xl font-bold">{totalReceipts} ل.س</div>
           </div>
         </div>
       </div>
