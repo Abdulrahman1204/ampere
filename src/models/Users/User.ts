@@ -63,12 +63,7 @@ const validateCreateUser = (obj: IUser): joi.ValidationResult => {
       .string()
       .trim()
       .length(10)
-      .pattern(/^09\d{8}$/)
-      .required()
-      .messages({
-        "string.pattern.base":
-          "Phone number must start with '09' and consist of 10 digits.",
-      }),
+      .required(),
     numberOfAmpere: joi.number().required(),
     numberOfPlate: joi.number().required(),
     totalPrice: joi.number(),
@@ -85,12 +80,7 @@ const validateUpdateUser = (obj: IUser): joi.ValidationResult => {
     phoneNumber: joi
       .string()
       .trim()
-      .length(10)
-      .pattern(/^09\d{8}$/)
-      .messages({
-        "string.pattern.base":
-          "Phone number must start with '09' and consist of 10 digits.",
-      }),
+      .length(10),
     numberOfAmpere: joi.number(),
     numberOfPlate: joi.number(),
     available: joi.boolean(),
