@@ -32,6 +32,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: error.details[0].message });
     }
 
+    const user = await User.findOne({ userName: body.userName });
+    if (user) {
+      return NextResponse.json(
+        { message: "الاسم موجود بالفعل" },
+        { status: 400 }
+      );
+    }
+
     const settings = await Settings.findOne({});
     const priceOfAmpere = settings?.priceOfAmpere || 10;
 
