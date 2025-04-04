@@ -32,14 +32,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: error.details[0].message });
     }
 
-    const user = await User.findOne({ phoneNumber: body.phoneNumber });
-    if (user) {
-      return NextResponse.json(
-        { message: "Phone Number Already Exists" },
-        { status: 400 }
-      );
-    }
-
     const settings = await Settings.findOne({});
     const priceOfAmpere = settings?.priceOfAmpere || 10;
 
