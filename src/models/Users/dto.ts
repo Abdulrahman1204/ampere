@@ -27,7 +27,6 @@ export interface INewCustomer {
 
 export interface UserFilter {
   userName?: { $regex: RegExp };
-  phoneNumber?: string;
   role?: string;
   numberOfPlate?: number;
 }
