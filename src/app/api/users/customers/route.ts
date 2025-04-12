@@ -113,8 +113,6 @@ export async function GET(request: NextRequest) {
     
     const totalAmperes = totalAmperesResult[0]?.totalAmperes || 0;
     const users = await User.find(filter)
-      .skip(ARTICLE_PER_PAGE * (parseInt(pageNumber) - 1))
-      .limit(ARTICLE_PER_PAGE)
       .sort({ createdAt: -1 });
 
     return NextResponse.json(
