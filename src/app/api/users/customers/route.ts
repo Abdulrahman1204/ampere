@@ -82,7 +82,6 @@ export async function GET(request: NextRequest) {
 
     const userToken = verifyToken(request);
 
-    const pageNumber = request.nextUrl.searchParams.get("pageNumber") || "1";
     const numberOfPlate = request.nextUrl.searchParams.get("numberOfPlate");
     const userName = request.nextUrl.searchParams.get("userName");
 
