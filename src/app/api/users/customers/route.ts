@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { User, validateCreateUser } from "@/models/Users/User";
 import connectDB from "@/libs/mongodb";
-import { ARTICLE_PER_PAGE } from "@/utils/constants";
 import { verifyToken } from "@/utils/verifyToken";
 import { Settings } from "@/models/Settings/Settings";
 import { IUser, UserFilter } from "@/models/Users/dto";
