@@ -15,7 +15,7 @@ import EditCustomer from "./EditCustomer";
 import EditPriceCustomer from "./EditPriceCustomer";
 import Swal from "sweetalert2";
 
-const ARTICLE_PER_PAGE = 6;
+const ARTICLE_PER_PAGE = 30;
 
 const TableCustomers = () => {
   const dispatch: AppDispatch = useDispatch();

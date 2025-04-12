@@ -227,3 +227,82 @@ export async function POST(
     );
   }
 }
+
+/**
+ * @method GET
+ * @route ~/api/users/customers/:id
+ * @desc For Back User`s Paid
+ * @access only admin and superAdmin
+ */
+
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+
+    const { id } = await context.params;
+
+    const userToken = verifyToken(request);
+
+    if (userToken === null) {
+      return NextResponse.json(
+        { message: "only superAdmin, access denied" },
+        { status: 403 }
+      );
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    // العثور على آخر فاتورة مدفوعة لهذا المستخدم
+    const lastBill = await Bill.findOne({
+      userName: user.userName,
+      phoneNumber: user.phoneNumber,
+      price: user.totalPrice,
+      available: true,
+    }).sort({ createdAt: -1 });
+
+    if (!lastBill) {
+      return NextResponse.json(
+        { message: "No recent payment found to undo" },
+        { status: 404 }
+      );
+    }
+
+    // تحديث حالة الفاتورة إلى غير مدفوعة
+    await Bill.findByIdAndUpdate(lastBill._id, { available: false });
+
+    // خصم المبلغ من الأرباح
+    const profitsData = await Profits.findOne({});
+    const newProfits = (profitsData?.profits || 0) - user.totalPrice;
+    await Profits.findOneAndUpdate(
+      {},
+      { profits: newProfits },
+      { upsert: true, new: true }
+    );
+
+    // تحديث أسابيع المستخدم
+    const weeks = user.weeks;
+    const lastPaidWeekIndex = weeks.findLastIndex((week) => week); // البحث عن آخر أسبوع مدفوع
+
+    if (lastPaidWeekIndex !== -1) {
+      weeks[lastPaidWeekIndex] = false;
+      await User.findByIdAndUpdate(id, { weeks });
+    }
+
+    return NextResponse.json(
+      { message: "Payment successfully undone" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { message: "internal server error" },
+      { status: 500 }
+    );
+  }
+}
