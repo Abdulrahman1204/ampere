@@ -109,38 +109,66 @@ export async function PUT(request: NextRequest) {
   try {
     await connectDB();
 
+    // التحقق من صلاحيات المستخدم
     const userToken = verifyToken(request);
-
     if (userToken === null || userToken.role !== "superAdmin") {
       return NextResponse.json(
-        { message: "only superAdmin, access denied" },
+        { message: "Only superAdmin can access this route" },
         { status: 403 }
       );
     }
 
+    // تحقق من صحة البيانات المرسلة
     const body = (await request.json()) as IProfits;
-    const { profits } = body;
-
     const { error } = validateUpdateProfits(body);
     if (error) {
-      return NextResponse.json({ message: error.details[0].message });
+      return NextResponse.json(
+        { message: error.details[0].message },
+        { status: 400 }
+      );
     }
 
-    const oldProfits = await Profits.findOne();
-    const previousProfitAmount = oldProfits?.profits || 0;
-    await Profits.findOneAndUpdate(
+    // حساب الأرباح الحقيقية من الفواتير المتاحة
+    const [diesel, repair, expenses, receipts] = await Promise.all([
+      Bill.find({ category: "مازوت", available: true }),
+      Bill.find({ category: "تصليح", available: true }),
+      Bill.find({ category: "مصاريف", available: true }),
+      Bill.find({ category: "مقبوضات", available: true }),
+    ]);
+
+    const totals = {
+      diesel: diesel.reduce((sum, item) => sum + item.price, 0),
+      repair: repair.reduce((sum, item) => sum + item.price, 0),
+      expenses: expenses.reduce((sum, item) => sum + item.price, 0),
+      receipts: receipts.reduce((sum, item) => sum + item.price, 0),
+    };
+
+    const actualProfit =
+      totals.receipts - (totals.expenses + totals.diesel + totals.repair);
+
+    // تحديث أو إنشاء سجل الأرباح
+    const updatedProfits = await Profits.findOneAndUpdate(
       {},
       {
-        profits,
-        $push: { updates: { amount: previousProfitAmount } }, // إضافة التحديث الجديد للمصفوفة
+        profits: body.profits,
+        $push: {
+          updates: {
+            amount: actualProfit,
+            date: new Date(),
+          },
+        },
       },
       { upsert: true, new: true }
     );
 
-    await Bill.updateMany({ available: true }, { $set: { available: false } });
+    // تعطيل جميع الفواتير القديمة
+    await Bill.updateMany({ available: true }, { available: false });
 
     return NextResponse.json(
-      { message: "Profits updated successfully" },
+      {
+        message: "Profits updated successfully",
+        updatedProfits
+      },
       { status: 200 }
     );
   } catch (error) {
