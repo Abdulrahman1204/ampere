@@ -160,9 +160,9 @@ export async function PUT(request: NextRequest) {
       },
       { upsert: true, new: true }
     );
-
-    // تعطيل جميع الفواتير القديمة
-    await Bill.updateMany({ available: true }, { available: false });
+    
+    // حذف جميع بيانات الفواتير
+    await Bill.deleteMany({});
 
     return NextResponse.json(
       {
