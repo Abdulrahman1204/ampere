@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { User, validateCreateUser } from "@/models/Users/User";
 import connectDB from "@/libs/mongodb";
-import { ARTICLE_PER_PAGE } from "@/utils/constants";
 import { verifyToken } from "@/utils/verifyToken";
 import { Settings } from "@/models/Settings/Settings";
 import { IUser, UserFilter } from "@/models/Users/dto";
@@ -83,7 +82,6 @@ export async function GET(request: NextRequest) {
 
     const userToken = verifyToken(request);
 
-    const pageNumber = request.nextUrl.searchParams.get("pageNumber") || "1";
     const numberOfPlate = request.nextUrl.searchParams.get("numberOfPlate");
     const userName = request.nextUrl.searchParams.get("userName");
 
@@ -113,8 +111,6 @@ export async function GET(request: NextRequest) {
     
     const totalAmperes = totalAmperesResult[0]?.totalAmperes || 0;
     const users = await User.find(filter)
-      .skip(ARTICLE_PER_PAGE * (parseInt(pageNumber) - 1))
-      .limit(ARTICLE_PER_PAGE)
       .sort({ createdAt: -1 });
 
     return NextResponse.json(
