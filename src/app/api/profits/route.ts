@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/libs/mongodb";
-import { verifyToken } from "@/utils/verifyToken";
 import { IProfits } from "@/models/Profits/dto";
 import {
   Profits,
@@ -18,15 +17,6 @@ import { Bill } from "@/models/Bills/Bills";
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-
-    const userToken = verifyToken(request);
-
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const body = (await request.json()) as IProfits;
     const { profits } = body;
@@ -67,18 +57,9 @@ export async function POST(request: NextRequest) {
  * @desc Get profit
  * @access from superAdmin just
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
-
-    const userToken = verifyToken(request);
-
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const profitsModel = await Profits.findOne({}).sort({ createdAt: -1 });
     if (!profitsModel) {
@@ -108,15 +89,6 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     await connectDB();
-
-    // التحقق من صلاحيات المستخدم
-    const userToken = verifyToken(request);
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "Only superAdmin can access this route" },
-        { status: 403 }
-      );
-    }
 
     // تحقق من صحة البيانات المرسلة
     const body = (await request.json()) as IProfits;
