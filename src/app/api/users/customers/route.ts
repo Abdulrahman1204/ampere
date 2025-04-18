@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { User, validateCreateUser } from "@/models/Users/User";
 import connectDB from "@/libs/mongodb";
-import { verifyToken } from "@/utils/verifyToken";
 import { Settings } from "@/models/Settings/Settings";
 import { IUser, UserFilter } from "@/models/Users/dto";
 
@@ -15,14 +14,6 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
-    const userToken = verifyToken(request);
-
-    if (userToken === null) {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const body = (await request.json()) as IUser;
 
@@ -80,17 +71,9 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const userToken = verifyToken(request);
-
     const numberOfPlate = request.nextUrl.searchParams.get("numberOfPlate");
     const userName = request.nextUrl.searchParams.get("userName");
 
-    if (userToken === null) {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const filter: UserFilter = {};
 
