@@ -41,6 +41,10 @@ const UserSchema: Schema<IUser> = new Schema(
       type: [Boolean], 
       default: [false, false, false, false], 
     },
+    weeksDate:{
+      type: [String]
+
+    },
     startDate: {
       type: Date, // تاريخ بداية الفترة
     },
@@ -49,6 +53,36 @@ const UserSchema: Schema<IUser> = new Schema(
     timestamps: true,
   }
 );
+
+
+// في ملف السكيما (مثل user.model.ts)
+UserSchema.pre<IUser>("save", function (next) {
+  // تحديث weeksDate إذا تم تغيير startDate أو إنشاء مستخدم جديد
+  if (this.isModified("startDate") || this.isNew) {
+    if (this.startDate) {
+      const startDate = new Date(this.startDate);
+      this.weeksDate = [];
+      for (let i = 0; i < 4; i++) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + 7 * i);
+        this.weeksDate.push(date.toISOString().split("T")[0]);
+      }
+    }
+  }
+  next();
+});
+
+  UserSchema.post('findOneAndUpdate', async function(doc) {
+    if (doc.startDate) {
+      const startDate = new Date(doc.startDate);
+      doc.weeksDate = Array.from({ length: 4 }, (_, i) => {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + 7 * i);
+        return date.toISOString().split('T')[0];
+      });
+      await doc.save();
+    }
+  });
 
 // User Model
 const User: Model<IUser> =
