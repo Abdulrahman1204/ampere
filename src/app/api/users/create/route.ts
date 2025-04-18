@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { Admin, validateCreateAdmin } from "@/models/Users/Admin";
 import { CreateAdminInput, UserFilter } from "@/models/Users/dto";
 import connectDB from "@/libs/mongodb";
-import { verifyToken } from "@/utils/verifyToken";
 import { ARTICLE_PER_PAGE } from "@/utils/constants";
 
 /**
@@ -14,15 +13,6 @@ import { ARTICLE_PER_PAGE } from "@/utils/constants";
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-
-    const userToken = verifyToken(request);
-
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const body = (await request.json()) as CreateAdminInput;
     const { error } = validateCreateAdmin(body);
@@ -69,18 +59,9 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const userToken = verifyToken(request);
-
     const pageNumber = request.nextUrl.searchParams.get("pageNumber") || "1";
     const phoneNumber = request.nextUrl.searchParams.get("phoneNumber");
     const userName = request.nextUrl.searchParams.get("userName");
-
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const filter: UserFilter = {role: "admin"};
 
