@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/libs/mongodb";
-import { verifyToken } from "@/utils/verifyToken";
 import { ARTICLE_PER_PAGE } from "@/utils/constants";
 import { Bill, validateCreateBill } from "@/models/Bills/Bills";
 import { IBill, BillFilter, ProductsFilter } from "@/models/Bills/dto";
@@ -15,15 +14,6 @@ import { Profits } from "@/models/Profits/Profits";
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-
-    const userToken = verifyToken(request);
-
-    if (userToken === null) {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const body = (await request.json()) as IBill;
 
@@ -72,15 +62,6 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-
-    const userToken = verifyToken(request);
-
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "Only superAdmin can access this route" },
-        { status: 403 }
-      );
-    }
 
     const category = request.nextUrl.searchParams.get("category");
     const fromDate = request.nextUrl.searchParams.get("from");
