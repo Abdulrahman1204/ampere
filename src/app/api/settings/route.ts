@@ -5,7 +5,6 @@ import {
   validateUpdateSettings,
 } from "@/models/Settings/Settings";
 import connectDB from "@/libs/mongodb";
-import { verifyToken } from "@/utils/verifyToken";
 import { ISetting } from "@/models/Settings/dto";
 import { User } from "@/models/Users/User";
 
@@ -18,15 +17,6 @@ import { User } from "@/models/Users/User";
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-
-    const userToken = verifyToken(request);
-
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const body = (await request.json()) as ISetting;
     const { priceOfAmpere } = body;
@@ -71,15 +61,6 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const userToken = verifyToken(request);
-
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
-
     const settings = await Settings.findOne();
 
     if (!settings) {
@@ -109,15 +90,6 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     await connectDB();
-
-    const userToken = verifyToken(request);
-
-    if (userToken === null || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const body = (await request.json()) as ISetting;
     const { priceOfAmpere } = body;
