@@ -147,6 +147,7 @@ export async function POST(
 
     const { id } = await context.params;
 
+
     const user = await User.findById(id);
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -157,16 +158,26 @@ export async function POST(
 
     if (firstUnpaidWeekIndex !== -1) {
       weeks[firstUnpaidWeekIndex] = true;
+    
       if (weeks.every((week) => week)) {
         weeks.fill(false);
-        const newStartDate = new Date(user.startDate || new Date()); // إذا لم يكن هناك startDate، نستخدم التاريخ الحالي
-        newStartDate.setMonth(newStartDate.getMonth() + 1); // الانتقال إلى الشهر الجديد
-        newStartDate.setDate(
-          newStartDate.getDate() + (6 - newStartDate.getDay())
-        );
-        await User.findByIdAndUpdate(id, { weeks, startDate: newStartDate });
+        
+        // احصل على آخر تاريخ من weeksDate أو استخدم التاريخ الحالي إذا لم يكن موجوداً
+        const lastWeekDate = user.weeksDate?.length > 0 
+          ? new Date(user.weeksDate[user.weeksDate.length - 1])
+          : new Date(user.startDate || new Date());
+        
+        // أضف أسبوعاً واحداً
+        lastWeekDate.setDate(lastWeekDate.getDate() + 7);
+        
+        // حدّث startDate
+        user.startDate = lastWeekDate;
+        
+        // سيتم تحديث weeksDate تلقائياً عبر الـ middleware عند حفظ user
+        await user.save();
       } else {
-        await User.findByIdAndUpdate(id, { weeks });
+        user.weeks = weeks;
+        await user.save();
       }
     }
 
