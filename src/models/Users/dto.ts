@@ -11,6 +11,7 @@ export interface IUser extends Document {
   totalPrice: number;
   note: string;
   weeks: boolean[];
+  weeksDate: string[];
   startDate: Date;
   createdAt: Date;
   updatedAt: Date; 
