@@ -22,15 +22,6 @@ export async function DELETE(
 
     const { id } = await context.params;
 
-    const userToken = verifyToken(request);
-
-    if (!userToken) {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
-
     const user = await User.findById(id);
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -65,15 +56,6 @@ export async function PUT(
     await connectDB();
 
     const { id } = await context.params;
-
-    const userToken = verifyToken(request);
-
-    if (!userToken) {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const user = await User.findById(id);
     if (!user) {
@@ -166,15 +148,6 @@ export async function POST(
 
     const { id } = await context.params;
 
-    const userToken = verifyToken(request);
-
-    if (userToken === null) {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
-
     const user = await User.findById(id);
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -244,14 +217,6 @@ export async function GET(
 
     const { id } = await context.params;
 
-    const userToken = verifyToken(request);
-
-    if (userToken === null) {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const user = await User.findById(id);
     if (!user) {
