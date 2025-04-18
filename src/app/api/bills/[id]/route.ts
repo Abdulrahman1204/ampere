@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/libs/mongodb";
-import { verifyToken } from "@/utils/verifyToken";
 import { Bill, validateUpdateBill } from "@/models/Bills/Bills";
 import { IBill } from "@/models/Bills/dto";
 
@@ -18,15 +17,6 @@ export async function DELETE(
     await connectDB();
 
     const { id } = await context.params;
-
-    const userToken = verifyToken(request);
-
-    if (!userToken || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const bill = await Bill.findById(id);
     if (!bill) {
@@ -62,15 +52,6 @@ export async function PUT(
     await connectDB();
 
     const { id } = await context.params;
-
-    const userToken = verifyToken(request);
-
-    if (!userToken || userToken.role !== "superAdmin") {
-      return NextResponse.json(
-        { message: "only superAdmin, access denied" },
-        { status: 403 }
-      );
-    }
 
     const bill = await Bill.findById(id);
     if (!bill) {
