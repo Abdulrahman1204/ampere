@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { User, validateUpdateUser } from "@/models/Users/User";
 import connectDB from "@/libs/mongodb";
-import { verifyToken } from "@/utils/verifyToken";
 import { Settings } from "@/models/Settings/Settings";
 import { IUser } from "@/models/Users/dto";
 import { Bill } from "@/models/Bills/Bills";
